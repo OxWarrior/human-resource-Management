@@ -13,7 +13,7 @@
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
-        <el-input ref="mobile" v-model="loginForm.mobile" placeholder="Mobile" name="mobile" type="text" tabindex="1" auto-complete="on" />
+        <el-input ref="mobile" v-model="loginForm.mobile" placeholder="请输入手机号" name="mobile" type="text" tabindex="1" auto-complete="on" />
       </el-form-item>
 
       <el-form-item prop="password">
@@ -27,6 +27,7 @@
       </el-form-item>
 
       <el-button class="loginBtn" :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button @click="getUserInfo">获取用户信息</el-button>
 
       <div class="tips">
         <span style="margin-right:20px;">账号: 13800000002</span>
@@ -39,29 +40,27 @@
 
 <script>
 import { validMobile } from '@/utils/validate'
+// import { login, getUserInfo } from '@/api/user'
+import { mapMutations, mapActions } from 'vuex'
 
 export default {
   name: 'Login',
   data() {
     const validateMobile = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入手机号'))
+      if (!validMobile(value)) {
+        callback(new Error('请输入正确手机号'))
       } else {
-        if (!validMobile(value)) {
-          callback(new Error('请输入正确手机号'))
-        } else {
-          callback()
-        }
+        callback()
       }
     }
-
     return {
       loginForm: {
-        mobile: '13988889999',
+        mobile: '13800000002',
         password: '123456'
       },
       loginRules: {
         mobile: [
+          { required: true, trigger: 'blur', message: '手机号不能为空' },
           { required: true, trigger: 'blur', validator: validateMobile }
         ],
         password: [
@@ -83,6 +82,8 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('user', ['setToken']),
+    ...mapActions('user', ['userLogin']),
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -93,21 +94,38 @@ export default {
         this.$refs.password.focus()
       })
     },
+    // 登录整体校验
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
+      this.$refs.loginForm.validate(async valid => {
+        // valid 是否校验成功
+        if (!valid) return
+        // 借助映射函数
+        this.userLogin(this.loginForm)
+
+        // this.$store.dispatch('user/userLogin', this.loginForm)
+
+        // const res = await login(this.loginForm)
+        // console.log(res.data)
+
+        // 借助映射函数
+        // this.setToken(res.data)
+
+        // 直接使用实例上的方法
+        // this.$store.commit('user/setToken', res.data)
+
+        // try {
+        //   const res = await login(this.loginForm)
+        //   console.log(res.data)
+        // } catch (error) {
+        //   this.$message.error(error.message)
+        //   console.log(error)
+        // }
       })
+    },
+
+    async getUserInfo() {
+      // const res = await getUserInfo()
+      // console.log(res)
     }
   }
 }

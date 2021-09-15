@@ -36,7 +36,18 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    // 代理转发服务器配置
+    proxy: {
+      // 以api开头的路径都会匹配到这里，触发代理转发，并且会将/api拼接到target路径后
+      '/dev_api': {
+        target: 'http://localhost:3000', // 目标的服务器地址路径，指向哪一个服务器发请求
+        changeOrigin: true, // 是否同源，必须true开启
+        pathRewrite: { // 路径重写,跟服务器地址匹配
+          '^/dev_api': '/api'
+        }
+      }
+    }
+    // before: require('./mock/mock-server.js')
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
