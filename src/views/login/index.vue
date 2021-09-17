@@ -27,7 +27,6 @@
       </el-form-item>
 
       <el-button class="loginBtn" :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-      <el-button @click="getUserInfo">获取用户信息</el-button>
 
       <div class="tips">
         <span style="margin-right:20px;">账号: 13800000002</span>
@@ -99,9 +98,12 @@ export default {
       this.$refs.loginForm.validate(async valid => {
         // valid 是否校验成功
         if (!valid) return
+        this.loading = true // 请求之前加载按钮，防止多次点击
         // 借助映射函数
-        this.userLogin(this.loginForm)
-
+        await this.userLogin(this.loginForm)
+        this.loading = false // 请求完成后
+        // 页面跳转
+        this.$router.push(this.$route.query.returnUrl || '/')
         // this.$store.dispatch('user/userLogin', this.loginForm)
 
         // const res = await login(this.loginForm)
@@ -121,12 +123,12 @@ export default {
         //   console.log(error)
         // }
       })
-    },
-
-    async getUserInfo() {
-      // const res = await getUserInfo()
-      // console.log(res)
     }
+
+    // async getUserInfo() {
+    //   // const res = await getUserInfo()
+    //   // console.log(res)
+    // }
   }
 }
 </script>

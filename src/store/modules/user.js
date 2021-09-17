@@ -1,10 +1,11 @@
 // 引入token方法
-import { setToken, getToken } from '@/utils/auth'
+import { setToken, getToken, removeToken } from '@/utils/auth'
 // 引入登录接口
-import { login } from '@/api/user'
+import { login, getUserInfo, getUserDetailById } from '@/api/user'
 
 const state = {
-  token: getToken() || null
+  token: getToken() || null, // 用户token
+  userInfo: {} // 用户信息
 }
 
 const mutations = {
@@ -17,6 +18,15 @@ const mutations = {
   // 移除token
   removeToken(state) {
     state.token = null
+    removeToken()
+  },
+  // 设置用户信息
+  setUserInfo(state, userInfo) {
+    state.userInfo = userInfo
+  },
+  // 移除用户信息
+  removeUserInfo(state) {
+    state.userInfo = {}
   }
 }
 
@@ -28,6 +38,19 @@ const actions = {
     // 调用mutation方法对token赋值
     // console.log(context)
     context.commit('setToken', res.data)
+  },
+  // 获取用户信息
+  async getUserInfo(context) {
+    const res = await getUserInfo()
+    const resp = await getUserDetailById(res.data.userId)
+    // console.log(resp)
+    context.commit('setUserInfo', { ...res.data, ...resp.data })
+  },
+  // 退出登录
+  userLogout(context) {
+    // 清空token和userInfo
+    context.commit('removeToken')
+    context.commit('removeUserInfo')
   }
 }
 

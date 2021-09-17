@@ -34,3 +34,15 @@ export function getUserInfo() {
     url: '/sys/profile'
   })
 }
+
+/**
+ * @description 获取员工的基本信息
+ * @param {Number} id 用户id
+ * @returns
+ */
+export function getUserDetailById(id) {
+  return request({
+    method: 'GET',
+    url: `/sys/user/${id}`
+  })
+}

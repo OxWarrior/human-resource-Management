@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
 import store from '@/store'
+import router from '@/router'
 // import { getToken } from '@/utils/auth'
 
 // create an axios instance
@@ -57,12 +58,23 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error) // for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+    if (error.response && error.response.data && error.response.data.code === 10002) {
+      // 清空用户信息
+      store.dispatch('user/userLogout')
+      // 跳转登录页
+      router.push('/login')
+      Message({
+        message: '请重新登录',
+        type: 'error'
+      })
+    } else {
+      Message({
+        message: error.message,
+        type: 'error',
+        duration: 5 * 1000
+      })
+    }
+
     return Promise.reject(error)
   }
 )
