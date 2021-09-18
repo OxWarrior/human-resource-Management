@@ -5,6 +5,9 @@ import store from '@/store'
 import nProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
+// 引入设置标题
+import getPageTitle from '@/utils/get-page-title'
+
 // 路由白名单
 const whiteLists = ['/login', '/404']
 
@@ -29,6 +32,12 @@ router.beforeEach(async(to, from, next) => {
     }
   }
   nProgress.done()
+})
+
+// 设置页面标题
+router.beforeEach((to, from, next) => {
+  document.title = getPageTitle(to.meta.title)
+  next()
 })
 
 // 路由后置守卫 前后路由一致，不会触发路由后置守卫

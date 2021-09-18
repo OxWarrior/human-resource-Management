@@ -115,3 +115,24 @@ export function param2Obj(url) {
   })
   return obj
 }
+
+/**
+ * @description 扁平数组转树形
+ * @param {}
+ * @return {Array}
+ */
+export function tranListToTreeData(data, rootValue) {
+  const treeData = [] // 定义一个空数组
+
+  data.forEach(item => {
+    if (item.pid === rootValue) { // 判断pid是否与... 相等
+      // 递归调用
+      const children = tranListToTreeData(data, item.id)
+      if (children.length) {
+        item.children = children
+      }
+      treeData.push(item)
+    }
+  })
+  return treeData
+}

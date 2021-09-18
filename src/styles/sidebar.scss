@@ -73,25 +73,38 @@
             color: #fff;
             font-size: 18px;
             vertical-align: middle;
-          .icon {
+            .icon {
             color: #fff;
-          }
+            }
           }
 
         span {
-        color: #fff;
-      }
-
-      &:hover {
-        .svg-icon {
-          color: #43a7fe;
+          color: #fff;
         }
+
+        &:hover {
+          .svg-icon {
+            color: #43a7fe;
+          }
         
-        span {
-          color: #43a7fe;
+          span {
+            color: #43a7fe;
+          }
+        }
+       
+      }
+      // 添加以下样式
+      .is-active {
+        background-color: $menuText !important;
+          
+        span{
+          color: $menuActiveText !important;
+        }
+          
+        .svg-icon{
+          color: $menuActiveText !important;
         }
       }
-    }
   }
 }
 
