@@ -23,7 +23,7 @@
                         操作<i class="el-icon-arrow-down el-icon--right" />
                       </span>
                       <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item>添加子部门</el-dropdown-item>
+                        <el-dropdown-item @click.native="addDepartment('')">添加子部门</el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
                   </el-col>
@@ -32,7 +32,7 @@
             </el-row>
 
             <!-- 主体区域绘制 -->
-            <el-tree class="departments-tree" :data="treeData" :props="defaultProps" :default-expand-all="true">
+            <el-tree class="departments-tree" :data="treeData" :props="defaultProps" default-expand-all>
               <template slot-scope="{ data }">
                 <el-row type="flex" justify="space-between" style="height: 50px; width: 100%;" align="middle">
                   <el-col :span="20">
@@ -47,7 +47,9 @@
                             操作<i class="el-icon-arrow-down el-icon--right" />
                           </span>
                           <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native="showDialog = true">添加子部门</el-dropdown-item>
+                            <el-dropdown-item @click.native="addDepartment(data.id)">添加子部门</el-dropdown-item>
+                            <el-dropdown-item @click.native="editDepartment(data.id)">编辑部门</el-dropdown-item>
+                            <el-dropdown-item v-if="data && !data.children" @click.native="delDepartment(data.id)">删除部门</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
                       </el-col>
@@ -59,15 +61,10 @@
           </el-tab-pane>
 
           <!-- 弹框 -->
-          <el-dialog
-            title="新增/编辑组织架构"
-            :visible.sync="showDialog"
-            width="50%"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-          >
+          <el-dialog title="新增/编辑组织架构" :visible.sync="showDialog" width="50%" :close-on-click-modal="false" :close-on-press-escape="false" @close="closeFn">
+
             <!-- 弹框组件 -->
-            <dept-dialog />
+            <dept-dialog v-if="showDialog" ref="deptDialog" :origin-list="originList" :parent-id="patentId" :is-edit="isEdit" @closeDialog="closeDialogFn" />
 
           </el-dialog>
 
@@ -84,7 +81,7 @@
 </template>
 
 <script>
-import { getDepartments } from '@/api/departments'
+import { getDepartments, delDepartment } from '@/api/departments'
 import { tranListToTreeData } from '@/utils'
 import DeptDialog from './deptDialog.vue'
 export default {
@@ -99,7 +96,10 @@ export default {
       defaultProps: { // 配置选项
         label: 'name'
       },
-      showDialog: false // 控制弹框显示
+      showDialog: false, // 控制弹框显示
+      patentId: '', // 父级部门ID
+      isEdit: false, // 区分新增和编辑
+      originList: []
     }
   },
   created() {
@@ -111,7 +111,63 @@ export default {
     async getDepartments() {
       const res = await getDepartments()
       // console.log(res)
+      // 格式化数据 返回的是一个数组
+      this.originList = res.data.depts.map(item => ({
+        id: item.id,
+        code: item.code,
+        pid: item.pid,
+        name: item.name
+      }))
+
       this.treeData = tranListToTreeData(res.data.depts, '')
+    },
+
+    // 添加子部门
+    addDepartment(id) {
+      this.isEdit = false
+      // 显示弹框
+      this.showDialog = true
+      this.patentId = id // 绑定
+    },
+
+    // 关闭弹框调用获取组织架构列表的方法重新渲染页面
+    closeDialogFn() {
+      this.showDialog = false
+      this.getDepartments()
+    },
+
+    // 编辑部门
+    editDepartment(id) {
+      this.isEdit = true
+      // 显示弹框
+      this.showDialog = true
+      this.patentId = id // 绑定
+    },
+
+    // 点击x关闭弹框
+    closeFn() {
+      this.$refs.deptDialog.resetForm()
+    },
+
+    // 根据部门id删除部门
+    async delDepartment(id) {
+      // 消息弹框
+      const confirmRes = await this.$confirm('是否删除此部门？', '确认信息', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确定删除',
+        cancelButtonText: '取消'
+      }).catch(err => err)
+      // 点击取消返回一个消息提示
+      if (confirmRes === 'cancel') {
+        return this.$message('取消删除部门')
+      }
+      // 调用删除部门的API
+      const res = await delDepartment(id)
+
+      // 删除成功的消息提示
+      this.$message(res.message)
+      // 删除成功调用获取组织架构列表的方法
+      this.getDepartments()
     }
   }
 }
