@@ -48,7 +48,7 @@ export default {
       let existCodeList = this.originList.map(item => item.code)
       // 判断是否是编辑，筛选出 不含自身id 的方法
       if (this.isEdit) {
-        existCodeList = existCodeList.filter(item => item.id === this.parentId).map(item => item.code)
+        existCodeList = this.originList.filter(item => item.id !== this.parentId).map(item => item.code)
       }
       existCodeList.includes(value) ? callback(new Error(`部门编码${value}已经存在`)) : callback()
     }
@@ -107,6 +107,12 @@ export default {
       //   this.deptForm[key] = ''
       // }
       this.getDepartDetail()
+    },
+    isEdit(newValue, oldValue) {
+      // for (const key in this.deptForm) {
+      //   this.deptForm[key] = ''
+      // }
+      this.getDepartDetail()
     }
   },
 
@@ -117,7 +123,7 @@ export default {
     this.getDepartDetail()
   },
   methods: {
-    // 下拉框内容变化
+    // 下拉框内容变化校验规则
     changeSelect() {
       this.$refs.deptForm.validateField('manager')
     },
@@ -149,7 +155,7 @@ export default {
 
     // 根据ID修改部门详情
     async updateDepartments() {
-      await updateDepartments(this.deptForm)
+      await updateDepartments({ ...this.deptForm })
     },
 
     // 获取员工基本列表
@@ -171,9 +177,9 @@ export default {
     // 清空数据以及重置的方法
     resetForm() {
       // 清空数据
-      for (const key in this.deptForm) {
-        this.deptForm[key] = ''
-      }
+      // for (const key in this.deptForm) {
+      //   this.deptForm[key] = ''
+      // }
       // 调用element方法重置
       this.$refs.deptForm.resetFields()
       // 关闭弹框子传父

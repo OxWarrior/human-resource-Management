@@ -111,6 +111,7 @@ export default {
     async getDepartments() {
       const res = await getDepartments()
       // console.log(res)
+      // console.log(res.data.depts)
       // 格式化数据 返回的是一个数组
       this.originList = res.data.depts.map(item => ({
         id: item.id,
@@ -118,6 +119,7 @@ export default {
         pid: item.pid,
         name: item.name
       }))
+      // console.log(this.originList)
 
       this.treeData = tranListToTreeData(res.data.depts, '')
     },
