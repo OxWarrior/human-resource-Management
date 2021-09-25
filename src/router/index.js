@@ -43,9 +43,20 @@ export const constantRoutes = [
   },
 
   {
+    path: '/excel',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: '',
+      component: () => import('@/views//excel'),
+      meta: { title: 'Excel' } // 元信息
+    }]
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
+    hidden: true,
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
