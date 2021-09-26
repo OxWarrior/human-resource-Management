@@ -21,7 +21,12 @@
         <el-table :data="employeesList" border :default-sort="{prop: 'workNumber'}">
           <el-table-column type="index" label="序号" />
           <el-table-column prop="username" label="姓名" />
-          <el-table-column prop="staffPhoto" label="头像" />
+          <el-table-column prop="staffPhoto" label="头像">
+            <template slot-scope="scope">
+              <!-- <img class="staffPhoto" :src="scope.row.staffPhoto" alt=""> -->
+              <image-holder :src="scope.row.staffPhoto" />
+            </template>
+          </el-table-column>
           <el-table-column prop="mobile" label="手机号" />
           <el-table-column prop="workNumber" sortable label="工号" />
           <el-table-column prop="formOfEmployment" :formatter="formatter" label="聘用形式" />
@@ -39,7 +44,7 @@
           <el-table-column label="操作" width="280">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="$router.push(`/employees/detail?id=${scope.row.id}`)">查看</el-button>
-              <el-button type="text" size="small">分配角色</el-button>
+              <el-button type="text" size="small" @click="setEmp(scope.row.id)">分配角色</el-button>
               <el-button type="text" size="small" @click="delEmp(scope.row.id)">删除</el-button>
             </template>
           </el-table-column>
@@ -51,7 +56,7 @@
           <el-pagination :current-page="query.page" :page-sizes="[10, 15, 20, 25]" :page-size="query.size" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </el-row>
 
-        <!-- 弹窗 -->
+        <!-- 新增员工弹窗 -->
         <el-dialog
           title="新增员工"
           :visible.sync="showDialog"
@@ -67,6 +72,17 @@
 
         </el-dialog>
 
+        <!-- 分配角色弹窗 -->
+        <el-dialog
+          title="新增员工"
+          :visible.sync="showRoleDialog"
+          width="50%"
+        >
+
+          <assign-role v-if="showRoleDialog" :user-id="userId" @close="showRoleDialog=false" />
+
+        </el-dialog>
+
       </el-card>
     </div>
   </div>
@@ -76,13 +92,15 @@
 import { getEmployeeList, deleteEmployee } from '@/api/employees'
 import employeesEnum from '@/constant/employees'
 import EmpDialog from './empDialog.vue'
+import AssignRole from './assignRole.vue'
 
 // 引入dayjs做时间处理，体积更小
 import dayjs from 'dayjs'
 export default {
   name: 'Employees',
   components: {
-    EmpDialog
+    EmpDialog,
+    AssignRole
   },
   filters: {
     formatTime(time) {
@@ -98,7 +116,9 @@ export default {
       },
       employeesList: [], // 员工列表
       total: 0, // 数据总条数
-      showDialog: false // 控制弹窗
+      showDialog: false, // 控制新增员工弹窗
+      showRoleDialog: false, // 控制分配角色弹窗
+      userId: '' // 员工id
     }
   },
   created() {
@@ -107,6 +127,12 @@ export default {
   },
 
   methods: {
+    // 分配角色
+    setEmp(id) {
+      this.showRoleDialog = true
+      this.userId = id
+    },
+
     // 导出 Excel
     downloadExcel() {
       import('@/vendor/Export2Excel').then(async excel => {
@@ -219,4 +245,10 @@ export default {
 
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.staffPhoto {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+</style>

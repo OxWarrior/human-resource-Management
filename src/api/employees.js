@@ -75,3 +75,16 @@ export function saveUserDetailById(data) {
     data
   })
 }
+
+/**
+ * @description 给员工分配角色
+ * @param {*} data
+ * @returns
+ */
+export function assignRoles(data) {
+  return request({
+    url: '/sys/user/assignRoles',
+    method: 'PUT',
+    data
+  })
+}

@@ -10,7 +10,9 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar" class="user-avatar">
+          <!-- <img :src="avatar" class="user-avatar"> -->
+          <image-holder :src="avatar" class="user-avatar" />
+
           <!-- 1，实例方法 -->
           <!-- <span class="name">{{ $store.state.user.userInfo.username }}</span> -->
           <!-- 2，getter映射 -->

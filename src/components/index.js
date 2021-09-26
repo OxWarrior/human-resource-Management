@@ -4,12 +4,14 @@ import UploadExcel from './UploadExcel'
 
 import UploadImg from './UploadImg'
 
+import ImageHolder from './ImageHolder'
+
 // 将所有的组件添加进数组中
 const components = [
   PageTools,
   UploadExcel,
-  UploadImg
-
+  UploadImg,
+  ImageHolder
 ]
 
 export default {
