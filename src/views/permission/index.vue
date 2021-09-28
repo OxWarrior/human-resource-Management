@@ -16,7 +16,7 @@
               <!-- type为1是添加权限，2是按钮权限 -->
               <el-button v-if="scope.row.type === 1" type="text" @click="addPermission(2,scope.row.id)">添加</el-button>
               <el-button type="text" @click="editPerHander(scope.row.id)">编辑</el-button>
-              <el-button type="text">删除</el-button>
+              <el-button type="text" @click="delPerHander(scope.row.id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -35,11 +35,7 @@
               <el-input v-model="formData.description" style="width:90%" />
             </el-form-item>
             <el-form-item label="开启">
-              <el-switch
-                v-model="formData.enVisible"
-                active-value="1"
-                inactive-value="0"
-              />
+              <el-switch v-model="formData.enVisible" active-value="1" inactive-value="0" />
             </el-form-item>
           </el-form>
           <el-row slot="footer" type="flex" justify="center">
@@ -55,7 +51,7 @@
 </template>
 
 <script>
-import { getPermissionList, addPermission, updatePermission, getPermissionDetail } from '@/api/permission'
+import { getPermissionList, addPermission, updatePermission, getPermissionDetail, delPermission } from '@/api/permission'
 import { tranListToTreeData } from '@/utils'
 export default {
   name: 'Permission',
@@ -115,6 +111,19 @@ export default {
     this.getPermissionList()
   },
   methods: {
+    // 删除角色
+    async delPerHander(id) {
+      const confirmRes = await this.$confirm('此操作将永久删除该权限, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmRes === 'cancel') return this.$message('你取消了删除')
+      const res = await delPermission(id)
+      this.$message.success(res.message)
+      this.getPermissionList()
+    },
+
     // 提交确认
     addPermissionSubmit() {
       // 兜底验证

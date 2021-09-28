@@ -33,6 +33,8 @@ export default {
       return false
     },
     async handleSuccess({ results, header }) {
+      console.log(header)
+      console.log(results)
       // 父级接收到子组件传递的表头和具体的数据
       const arr = this.transExcel(results)
       // console.log(arr)
@@ -47,7 +49,7 @@ export default {
 
     // 格式化results
     transExcel(results) {
-      // 创建原始枚举对象
+      // 定义原始枚举对象
       const userRelations = {
         '入职日期': 'timeOfEntry',
         '手机号': 'mobile',

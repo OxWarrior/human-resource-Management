@@ -10,8 +10,8 @@
 
         <!-- 自定义右侧内容 -->
         <template #slot-right>
-          <el-button type="danger" size="small" @click="$router.push('/excel')">导入excel</el-button>
-          <el-button type="success" size="small" @click="downloadExcel">导出excel</el-button>
+          <el-button v-if="'import'" type="danger" size="small" @click="$router.push('/excel')">导入excel</el-button>
+          <el-button v-if="'export'" type="success" size="small" @click="downloadExcel">导出excel</el-button>
           <el-button type="primary" size="small" @click="showDialog = true">新增员工</el-button>
         </template>
       </page-tools>
@@ -151,7 +151,7 @@ export default {
         })
       })
     },
-    // 格式化到处数据
+    // 格式化导出数据
     transData(data) {
       // 准备枚举的对象
       const map = {

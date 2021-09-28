@@ -23,7 +23,7 @@
               <el-table-column label="操作">
                 <!-- 操作按钮 -->
                 <template slot-scope="scope">
-                  <el-button size="small" type="success">分配权限</el-button>
+                  <el-button size="small" type="success" @click="assignRole(scope.row.id)">分配权限</el-button>
                   <el-button size="small" type="primary" @click="editRole(scope.row.id)">编辑</el-button>
                   <el-button size="small" type="danger" @click="delRole(scope.row.id)">删除</el-button>
                 </template>
@@ -56,7 +56,7 @@
         </el-tabs>
       </el-card>
 
-      <!-- 弹窗 -->
+      <!-- 新增角色弹窗 -->
       <el-dialog title="新增角色" :visible.sync="showDialog" width="50%" @close="roleCancel">
         <!-- 表单 -->
         <el-form ref="roleForm" :model="roleForm" :rules="rules" label-width="80px">
@@ -72,6 +72,16 @@
           <el-button size="small" type="primary" @click="roleSubmit">确 定</el-button>
         </span>
       </el-dialog>
+
+      <!-- 分配权限点弹窗 -->
+      <el-dialog
+        v-if="dialogVisible"
+        title="分配权限点"
+        :visible.sync="dialogVisible"
+        width="50%"
+      >
+        <assign-permission :role-id="roleId" @update="update" />
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -79,8 +89,13 @@
 <script>
 import { getRoles, getCompanyInfo, addRole, getRoleId, updateRole, deleteRole } from '@/api/setting'
 import { mapGetters } from 'vuex'
+import AssignPermission from './assignPermission.vue'
 export default {
   name: 'Setting',
+  components: {
+    AssignPermission
+  },
+
   data() {
     return {
       activeName: 'first', // 当前激活页
@@ -104,7 +119,9 @@ export default {
           { required: true, message: '请输入公司描述信息', trigger: 'blur' }
         ]
       },
-      isEdit: false // 判断新增还是编辑标记
+      isEdit: false, // 判断新增还是编辑标记
+      dialogVisible: false, // 权限点弹窗管理标识
+      roleId: '' // 当前角色id--权限管理用
     }
   },
 
@@ -120,6 +137,18 @@ export default {
   },
 
   methods: {
+    // 更新权限列表
+    update() {
+      this.dialogVisible = false
+      this.getRoles()
+    },
+
+    // 分配权限点
+    assignRole(id) {
+      this.dialogVisible = true
+      this.roleId = id
+    },
+
     // 删除角色
     async delRole(id) {
       const confirmRes = await this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {

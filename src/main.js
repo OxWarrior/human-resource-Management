@@ -19,6 +19,9 @@ import components from '@/components'
 
 Vue.use(components)
 
+import directives from './directives'
+Vue.use(directives)
+
 if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
